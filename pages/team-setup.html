@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>팀 배정 설정 - 키네틱 러닝</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="../css/global.css"/>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased">
+
+  <!-- 상단 앱바 -->
+  <header class="w-full top-0 sticky z-40 bg-surface shadow-[0_4px_12px_rgba(0,74,198,0.1)]">
+    <div class="flex justify-between items-center h-16 px-container-margin w-full max-w-7xl mx-auto">
+      <button onclick="navigate('dashboard')"
+        class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-primary">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <h1 class="font-headline-md text-headline-md text-primary font-bold">팀 배정 설정</h1>
+      <button class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu4RrmCe73gG72ZaIR-_49CumxLA5nHrVpb6fxeOzcU6fn_fgBBQXwD9ySQmxju3do8zUVABeQVq1hbjtM70nsFvWvh22acTnDqaunbAmQN6lOHQCLaDY3eelUH0iLvhcOvZb5RG2OtN-prAJiJeGVHnXuR1MZHIRJLKEUnmlhx8O2PzALkSEIuinpAERjQ6gg8prQ-rVixGo5ZoUscL6YCz5JSakqYrDGPbgsCwahmqn7qObG_PngdueCkJciukM-BjkwOWAMp30"
+          alt="프로필" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-high"/>
+      </button>
+    </div>
+  </header>
+
+  <!-- 메인 -->
+  <main class="flex-grow flex justify-center items-start pt-lg pb-xl px-container-margin">
+    <div class="w-full max-w-3xl glass-panel rounded-xl border border-surface-container-low p-md md:p-lg">
+
+      <!-- 스텝퍼 -->
+      <div class="mb-xl">
+        <h2 class="font-headline-md text-headline-md text-primary mb-sm text-center">1단계: 설정</h2>
+        <div class="flex items-center justify-center max-w-md mx-auto">
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-lg shadow-md z-10">1</div>
+            <span class="font-label-md text-label-md text-primary mt-xs">설정</span>
+          </div>
+          <div class="flex-1 h-1 bg-surface-container-high mx-2 rounded-full"></div>
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-lg shadow-sm z-10">2</div>
+            <span class="font-label-md text-label-md text-on-surface-variant mt-xs">미리보기</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 설정 카드 그리드 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-xl">
+
+        <!-- 팀 수 카드 -->
+        <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30 flex flex-col justify-between bento-hover shadow-[0_4px_12px_rgba(0,74,198,0.05)]">
+          <div>
+            <div class="flex items-center gap-xs mb-sm">
+              <span class="material-symbols-outlined text-primary">groups</span>
+              <h3 class="font-label-md text-label-md text-on-surface font-bold text-lg">팀 수</h3>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-md">생성할 팀의 개수를 선택해주세요.</p>
+          </div>
+          <div class="flex items-center justify-center gap-md bg-surface-container-low rounded-lg p-sm">
+            <button onclick="stepTeamCount(-1)"
+              class="w-touch-target h-touch-target rounded-full bg-surface flex items-center justify-center text-primary shadow-sm hover:bg-surface-container-highest transition-colors active:scale-95 border border-outline-variant/50">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <input id="teamCount" type="number" min="2" max="20" value="4"
+              class="w-20 h-touch-target bg-surface border-2 border-outline-variant/50 focus:border-primary focus:ring-0 rounded-lg text-center font-headline-md text-headline-md text-primary font-bold shadow-inner"/>
+            <button onclick="stepTeamCount(1)"
+              class="w-touch-target h-touch-target rounded-full bg-surface flex items-center justify-center text-primary shadow-sm hover:bg-surface-container-highest transition-colors active:scale-95 border border-outline-variant/50">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 성별 비율 카드 -->
+        <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30 flex flex-col justify-between bento-hover shadow-[0_4px_12px_rgba(0,74,198,0.05)]">
+          <div>
+            <div class="flex items-center gap-xs mb-sm">
+              <span class="material-symbols-outlined text-secondary-container">balance</span>
+              <h3 class="font-label-md text-label-md text-on-surface font-bold text-lg">성별 비율</h3>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-md">팀 배정 시 성별 분배 방식을 선택하세요.</p>
+          </div>
+          <div class="flex flex-col gap-sm">
+            <div class="relative">
+              <input type="radio" id="genderRandom" name="genderBalance" value="random" checked class="peer sr-only custom-radio"/>
+              <label for="genderRandom" class="flex items-center p-sm border-2 border-outline-variant/50 rounded-lg cursor-pointer transition-all duration-200 hover:bg-surface-container-low bg-surface peer-checked:bg-surface-container peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined radio-icon text-outline-variant mr-sm">shuffle</span>
+                <span class="font-label-md text-label-md font-bold flex-1">랜덤</span>
+                <span class="material-symbols-outlined opacity-0 peer-checked:opacity-100 text-primary transition-opacity">check_circle</span>
+              </label>
+            </div>
+            <div class="relative">
+              <input type="radio" id="genderEqual" name="genderBalance" value="equal" class="peer sr-only custom-radio"/>
+              <label for="genderEqual" class="flex items-center p-sm border-2 border-outline-variant/50 rounded-lg cursor-pointer transition-all duration-200 hover:bg-surface-container-low bg-surface peer-checked:bg-surface-container peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined radio-icon text-outline-variant mr-sm">wc</span>
+                <span class="font-label-md text-label-md font-bold flex-1">남녀 균등 비율</span>
+                <span class="material-symbols-outlined opacity-0 peer-checked:opacity-100 text-primary transition-opacity">check_circle</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 팀 배정하기 버튼 -->
+      <div class="flex justify-center">
+        <button onclick="assignTeams()"
+          class="h-[56px] px-xl bg-primary text-on-primary font-button-text text-button-text rounded-full shadow-[0_4px_12px_rgba(0,74,198,0.2)] hover:bg-on-primary-fixed-variant active:scale-95 transition-all duration-200 flex items-center justify-center gap-sm w-full md:w-auto border-b-2 border-on-primary-fixed-variant">
+          <span class="material-symbols-outlined fill">magic_button</span>
+          팀 배정하기
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../js/app.js"></script>
+  <script>
+    function stepTeamCount(delta) {
+      const input = document.getElementById('teamCount');
+      const newVal = Math.min(20, Math.max(2, parseInt(input.value) + delta));
+      input.value = newVal;
+    }
+
+    function assignTeams() {
+      const teamCount = parseInt(document.getElementById('teamCount').value);
+      const genderBalance = document.querySelector('input[name="genderBalance"]:checked').value;
+
+      // 설정 저장
+      AppState.save('teamConfig', { teamCount, genderBalance });
+
+      // 실제 학생 데이터 사용
+      const students = AppState.classroom.students || [];
+      if (students.length === 0) {
+        alert('등록된 학생이 없습니다. 대시보드에서 학생을 먼저 추가해주세요.');
+        navigate('dashboard');
+        return;
+      }
+
+      // 셔플 (간단한 구현)
+      const shuffled = [...students].sort(() => Math.random() - 0.5);
+
+      const teams = Array.from({ length: teamCount }, (_, i) => ({
+        name: String.fromCharCode(65 + i) + '팀',
+        members: [],
+      }));
+
+      shuffled.forEach((s, i) => teams[i % teamCount].members.push(s));
+      AppState.save('teams', teams);
+
+      navigate('teamResult');
+    }
+  </script>
+</body>
+</html>

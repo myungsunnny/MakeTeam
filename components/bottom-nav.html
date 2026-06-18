@@ -1,0 +1,30 @@
+<!-- 공통 하단 탭바 -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant z-50">
+  <div class="flex justify-around items-center h-16 max-w-lg mx-auto px-container-margin">
+
+    <!-- 홈 -->
+    <button data-nav="dashboard"
+      onclick="navigate('dashboard')"
+      class="flex flex-col items-center gap-xs text-on-surface-variant hover:text-primary transition-colors min-w-[64px]">
+      <span class="material-symbols-outlined text-[24px]">home</span>
+      <span class="font-label-md text-label-md">홈</span>
+    </button>
+
+    <!-- 팀 -->
+    <button data-nav="team"
+      onclick="navigate('teamSetup')"
+      class="flex flex-col items-center gap-xs text-on-surface-variant hover:text-primary transition-colors min-w-[64px]">
+      <span class="material-symbols-outlined text-[24px]">group</span>
+      <span class="font-label-md text-label-md">팀</span>
+    </button>
+
+    <!-- 경기 -->
+    <button data-nav="tournament"
+      onclick="navigate('tournament')"
+      class="flex flex-col items-center gap-xs text-on-surface-variant hover:text-primary transition-colors min-w-[64px]">
+      <span class="material-symbols-outlined text-[24px]">sports</span>
+      <span class="font-label-md text-label-md">경기</span>
+    </button>
+
+  </div>
+</nav>

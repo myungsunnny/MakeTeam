@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>로그인 - 키네틱 러닝</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="./js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="./css/global.css"/>
+</head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center relative overflow-hidden bg-pattern font-body-md">
+
+  <!-- 배경 블러 장식 -->
+  <div class="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] rounded-full bg-surface-container-high opacity-60 blur-3xl -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] rounded-full bg-secondary-fixed opacity-30 blur-3xl -z-10 pointer-events-none"></div>
+
+  <main class="w-full max-w-md px-container-margin md:px-0 z-10 relative">
+    <div class="glass-panel rounded-xl p-lg flex flex-col gap-md">
+
+      <!-- 헤더 -->
+      <div class="text-center flex flex-col items-center gap-base mb-sm">
+        <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary shadow-[0_4px_12px_rgba(0,74,198,0.2)]">
+          <span class="material-symbols-outlined text-[32px] fill">school</span>
+        </div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary tracking-tight">
+          키네틱 러닝
+        </h1>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          다시 오신 것을 환영합니다! 수업을 시작해 볼까요.
+        </p>
+      </div>
+
+      <!-- 로그인 폼 -->
+      <div class="flex flex-col gap-sm w-full">
+
+        <!-- 이메일 -->
+        <div class="flex flex-col gap-xs">
+          <label class="font-label-md text-label-md text-on-surface" for="email">이메일 또는 교사 ID</label>
+          <div class="relative flex items-center input-focus-ring rounded-lg bg-surface-container-lowest border border-outline-variant overflow-hidden h-touch-target">
+            <span class="material-symbols-outlined absolute left-sm text-on-surface-variant">person</span>
+            <input id="email" type="text" placeholder="예: teacher@school.edu" required
+              class="w-full h-full bg-transparent border-none focus:ring-0 pl-10 pr-sm font-body-md text-body-md text-on-surface placeholder:text-outline"/>
+          </div>
+        </div>
+
+        <!-- 비밀번호 -->
+        <div class="flex flex-col gap-xs">
+          <label class="font-label-md text-label-md text-on-surface" for="password">비밀번호</label>
+          <div class="relative flex items-center input-focus-ring rounded-lg bg-surface-container-lowest border border-outline-variant overflow-hidden h-touch-target">
+            <span class="material-symbols-outlined absolute left-sm text-on-surface-variant">lock</span>
+            <input id="password" type="password" placeholder="••••••••" required
+              class="w-full h-full bg-transparent border-none focus:ring-0 pl-10 pr-sm font-body-md text-body-md text-on-surface placeholder:text-outline"/>
+          </div>
+        </div>
+
+        <!-- 비밀번호 찾기 -->
+        <div class="flex justify-end mt-[-8px]">
+          <a href="#" class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors">
+            비밀번호를 잊으셨나요?
+          </a>
+        </div>
+
+        <!-- 로그인 버튼 -->
+        <button onclick="handleLogin()"
+          class="w-full h-touch-target bg-primary text-on-primary rounded-lg font-button-text text-button-text flex items-center justify-center gap-xs shadow-[0_4px_12px_rgba(0,74,198,0.2)] hover:bg-on-primary-fixed-variant active:scale-[0.98] transition-all duration-200 mt-sm border-b-[3px] border-[#003896]">
+          <span>로그인</span>
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- 구분선 -->
+      <div class="flex items-center gap-sm w-full">
+        <div class="flex-grow h-px bg-outline-variant opacity-50"></div>
+        <span class="font-label-md text-label-md text-on-surface-variant">또는</span>
+        <div class="flex-grow h-px bg-outline-variant opacity-50"></div>
+      </div>
+
+      <!-- 구글 로그인 -->
+      <button type="button"
+        class="w-full h-touch-target bg-surface-container-lowest text-on-surface border border-outline-variant rounded-lg font-button-text text-button-text flex items-center justify-center gap-sm hover:bg-surface-container-low active:scale-[0.98] transition-all duration-200 shadow-sm border-b-[2px]">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOTI_hGuZuXjOfeUFtuD5oNNhyrW2tUIpIknaArUualrzxyAm7vjlMhbIKfo_rMYOi9PxMdgSF9HHHWMu4q7UkixJUBxENDOojxGd58p6zwsl2riUPfSaUuJnz4JjmbumuaGu_MpHw_L_8QJKe7PJQ7PYlZtPiwVKvpOvuKPnETr15DZkmqLOxaFsGXtfeWpO4Lwm6PXkfOMj7gfwG1twzwFxrbrZoTEQz4OG21YuwUje7oKoqmtWBEFehCo1TZEFEWV3fBmJrF_k"
+          alt="Google" class="w-6 h-6 object-contain"/>
+        <span>Google로 계속하기</span>
+      </button>
+
+      <!-- 회원가입 -->
+      <div class="text-center">
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          처음 오셨나요?
+          <a href="#" class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors underline decoration-2 underline-offset-4">
+            회원가입
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function handleLogin() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if (!email || !password) {
+        alert('이메일과 비밀번호를 입력해주세요.');
+        return;
+      }
+      // TODO: 실제 인증 API 연결
+      AppState.login({ email, name: '선생님' });
+    }
+  </script>
+</body>
+</html>

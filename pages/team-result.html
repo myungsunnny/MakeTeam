@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>팀 배정 결과 - 키네틱 러닝</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    /* 팀 카드 색상 (A~D팀) */
+    .team-card-0 { background: #004ac6; }
+    .team-card-1 { background: #fed01b; }
+    .team-card-2 { background: #8e3c00; }
+    .team-card-3 { background: #2563eb; }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+
+  <!-- 상단 앱바 -->
+  <header class="bg-surface w-full top-0 sticky shadow-[0_4px_12px_rgba(0,74,198,0.1)] z-40">
+    <div class="flex justify-between items-center h-16 px-container-margin w-full max-w-7xl mx-auto">
+      <button onclick="navigate('teamSetup')"
+        class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-on-surface-variant">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="font-headline-md text-headline-md text-primary font-bold">4학년 호랑이반</h1>
+      <button class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant">person</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 메인 -->
+  <main class="flex-grow px-container-margin py-lg max-w-lg mx-auto w-full">
+
+    <div class="mb-lg">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">팀 배정 결과</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs" id="resultDesc">팀 배정이 완료되었습니다.</p>
+    </div>
+
+    <!-- 팀 카드 슬라이드 (가로 스크롤) -->
+    <div class="flex gap-md overflow-x-auto pb-md snap-x snap-mandatory mb-lg" id="teamCards">
+      <!-- JS로 생성 -->
+    </div>
+
+    <!-- 구분선 -->
+    <div class="h-px bg-outline-variant mb-lg"></div>
+
+    <!-- 액션 버튼 -->
+    <div class="flex flex-col gap-sm">
+      <button onclick="reshuffleTeams()"
+        class="w-full h-touch-target bg-surface-container-lowest text-on-surface border-2 border-outline-variant rounded-full font-button-text text-button-text flex items-center justify-center gap-sm hover:bg-surface-container-low active:scale-[0.98] transition-all duration-200">
+        <span class="material-symbols-outlined text-[20px]">shuffle</span>
+        다시 섞기
+      </button>
+      <button onclick="confirmTeams()"
+        class="w-full h-touch-target bg-primary text-on-primary rounded-full font-button-text text-button-text flex items-center justify-center gap-sm shadow-[0_4px_12px_rgba(0,74,198,0.2)] hover:bg-on-primary-fixed-variant active:scale-[0.98] transition-all duration-200 border-b-[3px] border-[#003896]">
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        배정 확정
+      </button>
+    </div>
+  </main>
+
+  <script src="../js/app.js"></script>
+  <script>
+    const teamColors = ['bg-primary', 'bg-secondary-container', 'bg-tertiary', 'bg-primary-container'];
+    const textColors = ['text-on-primary', 'text-on-secondary-container', 'text-on-tertiary', 'text-on-primary-container'];
+
+    function renderTeams() {
+      const teams = AppState.teams;
+      if (!teams) { navigate('teamSetup'); return; }
+
+      const totalCount = teams.reduce((s, t) => s + t.members.length, 0);
+      document.getElementById('resultDesc').textContent =
+        `모든 학생이 성공적으로 ${teams.length}개의 팀에 배정되었습니다.`;
+
+      const container = document.getElementById('teamCards');
+      container.innerHTML = teams.map((team, i) => `
+        <div class="min-w-[260px] snap-start rounded-xl overflow-hidden shadow-[0_4px_16px_rgba(0,74,198,0.15)] flex-shrink-0">
+          <div class="${teamColors[i % teamColors.length]} px-md py-sm flex justify-between items-center">
+            <span class="font-headline-md text-headline-md ${textColors[i % textColors.length]} font-bold">${team.name}</span>
+            <span class="bg-white/20 text-white text-sm font-bold px-3 py-1 rounded-full">${team.members.length}명</span>
+          </div>
+          <div class="bg-surface-container-lowest p-md flex flex-col gap-sm">
+            ${team.members.map(m => `
+              <div class="flex items-center gap-sm">
+                <div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span>
+                </div>
+                <span class="font-body-md text-body-md text-on-surface">${m}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function reshuffleTeams() {
+      if (confirm('현재 배정된 팀과 경기 기록이 모두 초기화됩니다. 다시 배정하시겠습니까?')) {
+        AppState.save('teams', null);
+        navigate('teamSetup');
+      }
+    }
+
+    function confirmTeams() {
+      navigate('tournament');
+    }
+
+    // 초기 실행 시 데이터가 없으면 뒤로가기
+    if (!AppState.teams) {
+      navigate('teamSetup');
+    } else {
+      renderTeams();
+    }
+  </script>
+</body>
+</html>

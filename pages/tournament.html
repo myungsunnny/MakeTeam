@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>토너먼트 대진표 - 키네틱 러닝</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    .round-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      gap: 2rem;
+      padding: 1rem 0;
+      width: 100%;
+    }
+    .match-box {
+      position: relative;
+      width: 160px;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .team-node {
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+    .team-node:hover {
+      transform: translateY(2px);
+      filter: brightness(1.05);
+    }
+    .team-node.winner-active {
+      animation: levelDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 20;
+    }
+    @keyframes levelDown {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(20px) scale(1.1); filter: brightness(1.2); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .trophy-glow {
+      animation: trophyGlow 2s infinite alternate;
+    }
+    @keyframes trophyGlow {
+      from { filter: drop-shadow(0 0 5px rgba(254, 208, 27, 0.3)); }
+      to { filter: drop-shadow(0 0 15px rgba(254, 208, 27, 0.8)); }
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md pb-16">
+
+  <!-- 상단 앱바 -->
+  <header class="bg-surface w-full top-0 sticky shadow-[0_4px_12px_rgba(0,74,198,0.1)] z-40">
+    <div class="flex justify-between items-center h-16 px-container-margin w-full max-w-7xl mx-auto">
+      <button onclick="navigate('dashboard')"
+        class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-on-surface-variant">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <h1 class="font-headline-md text-headline-md text-primary font-bold">4학년 호랑이반</h1>
+      <button class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu4RrmCe73gG72ZaIR-_49CumxLA5nHrVpb6fxeOzcU6fn_fgBBQXwD9ySQmxju3do8zUVABeQVq1hbjtM70nsFvWvh22acTnDqaunbAmQN6lOHQCLaDY3eelUH0iLvhcOvZb5RG2OtN-prAJiJeGVHnXuR1MZHIRJLKEUnmlhx8O2PzALkSEIuinpAERjQ6gg8prQ-rVixGo5ZoUscL6YCz5JSakqYrDGPbgsCwahmqn7qObG_PngdueCkJciukM-BjkwOWAMp30"
+          alt="프로필" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-high"/>
+      </button>
+    </div>
+  </header>
+
+  <!-- 메인 -->
+  <main class="flex-grow px-container-margin py-lg max-w-lg mx-auto w-full">
+
+    <div class="mb-lg">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold" id="pageTitle">경기 방식 선택</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs" id="pageSubTitle">원하는 경기 방식을 선택하고 진행하세요.</p>
+    </div>
+
+    <!-- 1단계: 경기 방식 및 설정 탭 -->
+    <div class="flex flex-col gap-md mb-lg">
+      <div class="grid grid-cols-2 gap-sm bg-surface-container-low rounded-xl p-xs">
+        <button id="format-tournament" onclick="setFormat('tournament')"
+          class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
+          토너먼트
+        </button>
+        <button id="format-league" onclick="setFormat('league')"
+          class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
+          리그전
+        </button>
+      </div>
+
+      <div id="league-config" class="hidden animate-in slide-in-from-top-4 duration-300">
+        <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm">
+          <label class="font-label-md text-on-surface-variant mb-sm block">진행할 총 경기 수 (팀당)</label>
+          <div class="flex items-center gap-md">
+            <input type="range" id="leagueMatchCount" min="1" max="10" value="1" 
+              class="flex-1 accent-primary" oninput="updateLeagueMatchText(this.value)">
+            <span class="font-headline-sm text-primary font-bold w-12 text-center" id="matchCountDisplay">1회</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="tournament-config" class="hidden animate-in slide-in-from-top-4 duration-300">
+        <button onclick="shuffleTournament()" class="w-full h-touch-target bg-surface-container-lowest text-primary border-2 border-primary/30 rounded-xl font-button-text flex items-center justify-center gap-sm hover:bg-primary/5 active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-[20px]">shuffle</span>
+          대진표 무작위 섞기
+        </button>
+      </div>
+    </div>
+
+    <!-- 2단계: 뷰 전환 -->
+    <div id="view-tabs" class="grid grid-cols-2 gap-sm bg-surface-container-low rounded-xl p-xs mb-lg">
+      <button id="tab-bracket" onclick="switchTab('bracket')"
+        class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
+        대진표
+      </button>
+      <button id="tab-ranking" onclick="switchTab('ranking')"
+        class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
+        순위표
+      </button>
+    </div>
+
+    <!-- 대진표 뷰 -->
+    <div id="view-bracket" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div id="tournament-graphic" class="hidden overflow-x-auto pb-lg mb-lg">
+        <div class="flex flex-col items-center min-w-max p-lg gap-12" id="bracketTree">
+          <!-- JS로 동적 트리 생성 -->
+        </div>
+      </div>
+      <div id="bracketContent" class="flex flex-col gap-md">
+        <!-- JS로 생성 -->
+      </div>
+    </div>
+
+    <!-- 순위표 뷰 -->
+    <div id="view-ranking" class="hidden">
+      <div id="rankingContent" class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+        <!-- JS로 생성 -->
+      </div>
+    </div>
+
+  </main>
+
+  <div id="teamModal" class="fixed inset-0 z-50 flex items-center justify-center p-md bg-black/40 hidden" onclick="closeTeamModal()">
+    <div class="bg-surface-container-lowest w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200" onclick="event.stopPropagation()">
+      <div id="modalHeader" class="px-lg py-md flex justify-between items-center">
+        <h3 id="modalTeamName" class="font-headline-md text-headline-md font-bold">팀 정보</h3>
+        <button onclick="closeTeamModal()" class="w-8 h-8 rounded-full hover:bg-black/5 flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-surface-variant">close</span>
+        </button>
+      </div>
+      <div id="modalMemberList" class="px-lg pb-lg flex flex-col gap-sm"></div>
+    </div>
+  </div>
+
+  <div id="bottom-nav-container"></div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    let currentFormat = AppState.matchFormat || 'tournament';
+    let leagueMatchCount = 1;
+
+    function setFormat(format) {
+      currentFormat = format;
+      AppState.save('matchFormat', format);
+      document.getElementById('league-config').classList.toggle('hidden', format !== 'league');
+      document.getElementById('tournament-config').classList.toggle('hidden', format !== 'tournament');
+      const activeClass = ['bg-surface-container-lowest', 'text-primary', 'shadow-sm'];
+      const inactiveClass = ['text-on-surface-variant', 'hover:bg-surface-container-low'];
+      ['tournament', 'league'].forEach(f => {
+        const btn = document.getElementById(`format-${f}`);
+        if (f === format) { btn.classList.add(...activeClass); btn.classList.remove(...inactiveClass); }
+        else { btn.classList.remove(...activeClass); btn.classList.add(...inactiveClass); }
+      });
+      document.getElementById('pageTitle').textContent = format === 'tournament' ? '토너먼트 경기' : '리그전 경기';
+      renderBracket();
+    }
+
+    function shuffleTournament() {
+      if (!confirm('대진표를 무작위로 다시 섞으시겠습니까? 기존 결과가 초기화됩니다.')) return;
+      const teams = [...AppState.teams].sort(() => Math.random() - 0.5);
+      AppState.save('teams', teams);
+      AppState.save('matchResults', []);
+      renderBracket();
+    }
+
+    function updateLeagueMatchText(val) {
+      leagueMatchCount = val;
+      document.getElementById('matchCountDisplay').textContent = `${val}회`;
+      renderBracket();
+    }
+
+    function switchTab(tab) {
+      const isBracket = tab === 'bracket';
+      document.getElementById('view-bracket').classList.toggle('hidden', !isBracket);
+      document.getElementById('view-ranking').classList.toggle('hidden', isBracket);
+      const activeClass = ['bg-surface-container-lowest', 'text-primary', 'shadow-sm'];
+      const inactiveClass = ['text-on-surface-variant', 'hover:bg-surface-container-low'];
+      ['bracket', 'ranking'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tab) { btn.classList.add(...activeClass); btn.classList.remove(...inactiveClass); }
+        else { btn.classList.remove(...activeClass); btn.classList.add(...inactiveClass); }
+      });
+      if (isBracket) renderBracket();
+      else renderRanking();
+    }
+
+    function getTournamentStructure(teams) {
+      const count = teams.length;
+      if (count < 2) return null;
+      const size = Math.pow(2, Math.ceil(Math.log2(count)));
+      const results = AppState.matchResults || [];
+      let currentRound = [];
+      for (let i = 0; i < size; i += 2) {
+        const team1 = teams[i] || null;
+        const team2 = teams[i+1] || null;
+        if (!team1 && !team2) continue;
+        const matchId = `t-r1-m${i/2}`;
+        const res = results.find(r => r.id === matchId);
+        let winner = null;
+        if (team1 && !team2) winner = team1;
+        else if (!team1 && team2) winner = team2;
+        else if (res) winner = (res.result === 'win1' ? team1 : team2);
+        currentRound.push({ id: matchId, team1, team2, winner, label: (size === 2 ? '결승' : (size === 4 ? '준결승' : '1라운드')) });
+      }
+      const rounds = [currentRound];
+      while (currentRound.length > 1) {
+        const nextRound = [];
+        for (let i = 0; i < currentRound.length; i += 2) {
+          const m1 = currentRound[i];
+          const m2 = currentRound[i+1];
+          const t1 = m1 ? m1.winner : null;
+          const t2 = m2 ? m2.winner : null;
+          const matchId = `t-r${rounds.length + 1}-m${i/2}`;
+          const res = results.find(r => r.id === matchId);
+          let winner = null;
+          if (t1 && !t2 && m1.winner && !m2) winner = t1;
+          else if (!t1 && t2 && !m1 && m2.winner) winner = t2;
+          else if (res) winner = (res.result === 'win1' ? t1 : t2);
+          const nextLabel = (currentRound.length / 2 === 1 ? '결승' : (currentRound.length / 2 === 2 ? '준결승' : `${rounds.length + 1}라운드`));
+          nextRound.push({ id: matchId, team1: t1, team2: t2, winner, label: nextLabel });
+        }
+        rounds.push(nextRound);
+        currentRound = nextRound;
+      }
+      return rounds;
+    }
+
+    function renderBracket() {
+      const teams = AppState.teams;
+      const container = document.getElementById('bracketContent');
+      const graphicView = document.getElementById('tournament-graphic');
+      if (!teams || teams.length === 0) {
+        container.innerHTML = `<div class="p-lg text-center opacity-50">배정된 팀이 없습니다.</div>`;
+        return;
+      }
+      if (currentFormat === 'tournament') {
+        graphicView.classList.remove('hidden');
+        const rounds = getTournamentStructure(teams);
+        renderTournamentGraphic(rounds);
+        const pending = rounds.flat().filter(m => m.team1 && m.team2);
+        container.innerHTML = pending.map((m, idx) => renderMatchCard(m, idx)).join('');
+      } else {
+        graphicView.classList.add('hidden');
+        let matches = [];
+        for (let i = 0; i < teams.length; i++) {
+          for (let j = i + 1; j < teams.length; j++) {
+            for (let r = 0; r < leagueMatchCount; r++) {
+              matches.push({ id: `league-${i}-${j}-${r}`, team1: teams[i], team2: teams[j], label: '리그전' });
+            }
+          }
+        }
+        container.innerHTML = matches.map((m, idx) => renderMatchCard(m, idx)).join('');
+      }
+    }
+
+    function renderMatchCard(match, idx) {
+      const results = AppState.matchResults || [];
+      const res = results.find(r => r.id === match.id);
+      const resType = res ? res.result : null;
+      return `
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300" style="animation-delay: ${idx * 50}ms">
+          <div class="bg-surface-container px-md py-sm flex justify-between items-center">
+            <span class="font-label-md text-on-surface-variant text-xs">${match.label}</span>
+            ${resType ? '<span class="text-primary font-bold text-[10px] bg-primary/10 px-2 py-0.5 rounded uppercase">Recorded</span>' : ''}
+          </div>
+          <div class="p-md flex flex-col gap-md">
+            <div class="flex items-center justify-between">
+              <div onclick="showTeamDetails('${match.team1.name}')" class="flex items-center gap-sm flex-1 cursor-pointer hover:bg-black/5 p-1 rounded-lg transition-colors">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs">${match.team1.name.charAt(0)}</div>
+                <span class="font-bold truncate">${match.team1.name}</span>
+              </div>
+              <span class="mx-4 text-outline-variant font-bold italic">VS</span>
+              <div onclick="showTeamDetails('${match.team2.name}')" class="flex items-center justify-end gap-sm flex-1 text-right cursor-pointer hover:bg-black/5 p-1 rounded-lg transition-colors">
+                <span class="font-bold truncate">${match.team2.name}</span>
+                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container text-xs">${match.team2.name.charAt(0)}</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-xs">
+              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'win1')" class="h-9 rounded-lg text-xs font-bold transition-all ${resType === 'win1' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${match.team1.name} 승</button>
+              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'draw')" class="h-9 rounded-lg text-xs font-bold transition-all ${resType === 'draw' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">무</button>
+              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'win2')" class="h-9 rounded-lg text-xs font-bold transition-all ${resType === 'win2' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${match.team2.name} 승</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTournamentGraphic(rounds) {
+      const treeContainer = document.getElementById('bracketTree');
+      let html = '';
+      
+      // 라운드별 렌더링 (순서대로 상단 -> 하단 진행)
+      rounds.forEach((round, rIdx) => {
+        html += `<div class="round-row">`;
+        round.forEach((match, mIdx) => {
+          const isWinner1 = match.winner && match.team1 && match.winner.name === match.team1.name;
+          const isWinner2 = match.winner && match.team2 && match.winner.name === match.team2.name;
+          
+          html += `
+            <div class="match-box">
+              <div class="bg-surface-container-lowest border-2 ${match.winner ? 'border-primary' : 'border-outline-variant'} rounded-xl overflow-hidden shadow-md">
+                ${renderTeamNodeInGraphic(match.team1, isWinner1, match.id, 'win1', match.team2)}
+                <div class="h-px bg-outline-variant/30"></div>
+                ${renderTeamNodeInGraphic(match.team2, isWinner2, match.id, 'win2', match.team1)}
+              </div>
+              <div class="text-[9px] text-center font-bold text-on-surface-variant mt-1 uppercase tracking-tighter">${match.label}</div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      });
+
+      // 우승컵 표시 (최하단)
+      const lastRound = rounds[rounds.length - 1][0];
+      const champion = lastRound.winner;
+      html += `
+        <div class="flex flex-col items-center gap-4 mt-4">
+          <div class="w-24 h-24 rounded-full bg-primary/10 border-4 ${champion ? 'border-primary trophy-glow' : 'border-outline-variant border-dashed'} flex items-center justify-center relative">
+            <span class="material-symbols-outlined text-5xl ${champion ? 'text-primary animate-bounce' : 'text-outline-variant'}">emoji_events</span>
+            ${champion ? `<div class="absolute -bottom-10 bg-primary text-on-primary px-3 py-1 rounded-full font-bold text-xs shadow-lg animate-in zoom-in">${champion.name} 우승!</div>` : ''}
+          </div>
+        </div>
+      `;
+      
+      treeContainer.innerHTML = html;
+    }
+
+    function renderTeamNodeInGraphic(team, isWinner, matchId, resVal, opponent) {
+      if (!team) return `<div class="p-2 text-[9px] text-outline-variant italic text-center">부전승 대기</div>`;
+      
+      const canClick = !!opponent;
+      const clickHandler = canClick ? `onclick="handleNodeClick(this, '${matchId}', '${team.name}', '${opponent.name}', '${resVal}')"` : '';
+      
+      return `
+        <div ${clickHandler} class="team-node p-2 flex items-center justify-between transition-all ${isWinner ? 'bg-primary/20' : 'hover:bg-black/5'}">
+          <div class="flex items-center gap-2 truncate">
+            <div class="w-5 h-5 rounded-full bg-primary text-[10px] text-on-primary flex items-center justify-center font-bold flex-shrink-0">${team.name.charAt(0)}</div>
+            <span class="text-xs font-bold truncate ${isWinner ? 'text-primary' : ''}">${team.name}</span>
+          </div>
+          ${isWinner ? '<span class="material-symbols-outlined text-primary text-sm animate-in zoom-in">check_circle</span>' : ''}
+        </div>
+      `;
+    }
+
+    function handleNodeClick(el, matchId, t1, t2, res) {
+      el.classList.add('winner-active');
+      setTimeout(() => {
+        setResult(matchId, t1, t2, res);
+      }, 400);
+    }
+
+    function setResult(matchId, t1, t2, res) {
+      AppState.recordResult(matchId, t1, t2, res);
+      renderBracket();
+    }
+
+    function renderRanking() {
+      const teams = AppState.teams; if (!teams) return;
+      const stats = AppState.teamsStats || {};
+      const sortedTeams = [...teams].sort((a, b) => (stats[b.name]?.points - stats[a.name]?.points) || (stats[b.name]?.wins - stats[a.name]?.wins) || a.name.localeCompare(b.name));
+      const rankingContainer = document.getElementById('rankingContent');
+      let html = `<div class="grid grid-cols-[3rem_1fr_2rem_2rem_2rem_3rem] gap-2 px-md py-3 bg-surface-container font-bold text-[10px] text-on-surface-variant uppercase tracking-widest"><span class="text-center">Rank</span><span>Team</span><span class="text-center">W</span><span class="text-center">D</span><span class="text-center">L</span><span class="text-center text-primary">Pts</span></div>`;
+      html += sortedTeams.map((team, i) => {
+        const s = stats[team.name] || { wins: 0, draws: 0, losses: 0, points: 0 };
+        return `<div onclick="showTeamDetails('${team.name}')" class="grid grid-cols-[3rem_1fr_2rem_2rem_2rem_3rem] gap-2 items-center px-md py-4 ${i > 0 ? 'border-t border-outline-variant/50' : ''} hover:bg-black/5 transition-colors cursor-pointer animate-in fade-in slide-in-from-left-4 duration-300" style="animation-delay: ${i * 70}ms">
+                  <span class="font-headline-md text-headline-md ${i === 0 ? 'text-primary' : 'text-on-surface-variant'} text-center">${i + 1}</span>
+                  <div class="flex items-center gap-sm overflow-hidden"><div class="w-7 h-7 rounded-full bg-${i === 0 ? 'primary' : 'surface-container-high'} flex items-center justify-center font-bold text-[9px] ${i === 0 ? 'text-on-primary' : ''} flex-shrink-0">${team.name.charAt(0)}</div><span class="font-body-md text-on-surface font-bold truncate">${team.name}</span></div>
+                  <span class="text-center text-xs">${s.wins}</span><span class="text-center text-xs">${s.draws}</span><span class="text-center text-xs">${s.losses}</span><span class="text-center font-bold text-primary">${s.points}</span>
+                </div>`;
+      }).join('');
+      rankingContainer.innerHTML = html;
+    }
+
+    function showTeamDetails(teamName) {
+      const team = AppState.teams.find(t => t.name === teamName);
+      if (!team) return;
+      document.getElementById('modalTeamName').textContent = team.name;
+      document.getElementById('modalMemberList').innerHTML = team.members.map(m => `<div class="flex items-center gap-md p-sm bg-surface-container-low rounded-xl"><div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">person</span></div><span class="font-body-md text-on-surface font-medium">${m}</span></div>`).join('');
+      document.getElementById('teamModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTeamModal() { document.getElementById('teamModal').classList.add('hidden'); document.body.style.overflow = ''; }
+
+    setFormat(currentFormat);
+    loadComponent('#bottom-nav-container', '../components/bottom-nav.html');
+  </script>
+</body>
+</html>

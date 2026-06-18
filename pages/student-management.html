@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>학생 관리 - 키네틱 러닝</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="../css/global.css"/>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased pb-16">
+
+  <!-- 상단 앱바 -->
+  <header class="w-full top-0 sticky z-40 bg-surface shadow-[0_4px_12px_rgba(0,74,198,0.1)]">
+    <div class="flex justify-between items-center h-16 px-container-margin w-full max-w-7xl mx-auto">
+      <button onclick="navigate('dashboard')"
+        class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-primary">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="font-headline-md text-headline-md text-primary font-bold">학생 관리</h1>
+      <div class="w-touch-target h-touch-target"></div> <!-- 균형을 위한 빈 공간 -->
+    </div>
+  </header>
+
+  <!-- 메인 -->
+  <main class="flex-grow px-container-margin py-lg max-w-lg mx-auto w-full">
+
+    <!-- 학생 추가 폼 -->
+    <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-[0_4px_12px_rgba(0,74,198,0.05)] mb-lg">
+      <h3 class="font-headline-md text-label-md text-on-surface font-bold mb-xs">학생 추가</h3>
+      <div class="flex gap-sm">
+        <input id="studentNameInput" type="text" placeholder="학생 이름을 입력하세요"
+          class="flex-1 h-touch-target bg-surface border-2 border-outline-variant focus:border-primary focus:ring-0 rounded-xl px-md font-body-md"
+          onkeyup="if(event.key === 'Enter') addStudent()"/>
+        <button onclick="addStudent()"
+          class="h-touch-target px-md bg-primary text-on-primary rounded-xl font-button-text text-button-text flex items-center justify-center gap-xs shadow-md hover:bg-on-primary-fixed-variant active:scale-95 transition-all">
+          <span class="material-symbols-outlined">add</span>
+          추가
+        </button>
+      </div>
+    </div>
+
+    <!-- 학생 목록 명렬표 -->
+    <section>
+      <div class="flex justify-between items-center mb-md">
+        <h3 class="font-headline-md text-headline-md text-on-surface">학생 명단 (<span id="studentCount">0</span>명)</h3>
+      </div>
+      
+      <div id="studentList" class="flex flex-col gap-sm">
+        <!-- 자바스크립트로 동적 렌더링 -->
+      </div>
+    </section>
+  </main>
+
+  <!-- 하단 탭바 -->
+  <div id="bottom-nav-container"></div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    loadComponent('#bottom-nav-container', '../components/bottom-nav.html');
+
+    // 학생 목록 렌더링 함수
+    function renderStudents() {
+      const listContainer = document.getElementById('studentList');
+      const countContainer = document.getElementById('studentCount');
+      
+      const students = AppState.classroom.students || [];
+      countContainer.textContent = students.length;
+      
+      if (students.length === 0) {
+        listContainer.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col items-center gap-sm text-center shadow-[0_4px_12px_rgba(0,74,198,0.05)]">
+            <span class="material-symbols-outlined text-[40px] text-outline-variant">person_off</span>
+            <p class="font-body-md text-body-md text-on-surface-variant">등록된 학생이 없습니다.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      listContainer.innerHTML = students.map((student, index) => `
+        <div class="bg-surface-container-lowest rounded-xl p-sm px-md border border-outline-variant/50 shadow-[0_2px_8px_rgba(0,74,198,0.03)] flex justify-between items-center bento-hover">
+          <div class="flex items-center gap-md">
+            <span class="font-label-md text-label-md text-on-surface-variant w-6 text-center">${index + 1}</span>
+            <span class="font-body-lg text-body-lg text-on-surface font-medium">${student}</span>
+          </div>
+          <button onclick="deleteStudent(${index})"
+            class="w-touch-target h-touch-target flex items-center justify-center text-outline hover:text-error rounded-full hover:bg-surface-container-low transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[20px]">delete</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // 학생 추가
+    function addStudent() {
+      const input = document.getElementById('studentNameInput');
+      const name = input.value.trim();
+      
+      if (!name) return;
+      
+      const students = [...(AppState.classroom.students || [])];
+      students.push(name);
+      
+      AppState.classroom.students = students;
+      AppState.save('classroom', AppState.classroom);
+      
+      input.value = '';
+      renderStudents();
+    }
+
+    // 학생 삭제
+    function deleteStudent(index) {
+      if (!confirm('이 학생을 삭제하시겠습니까?')) return;
+      
+      const students = [...(AppState.classroom.students || [])];
+      students.splice(index, 1);
+      
+      AppState.classroom.students = students;
+      AppState.save('classroom', AppState.classroom);
+      
+      renderStudents();
+    }
+
+    // 초기 실행
+    renderStudents();
+  </script>
+</body>
+</html>

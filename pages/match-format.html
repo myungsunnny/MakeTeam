@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>경기 방식 선택 - 키네틱 러닝</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="../css/global.css"/>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+
+  <!-- 상단 앱바 -->
+  <header class="bg-surface w-full top-0 sticky shadow-[0_4px_12px_rgba(0,74,198,0.1)] z-50">
+    <div class="flex justify-between items-center h-16 px-container-margin w-full max-w-7xl mx-auto">
+      <button onclick="navigate('teamResult')"
+        class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-on-surface-variant">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="font-headline-md text-headline-md text-primary font-bold">경기 방식 선택</h1>
+      <div class="w-touch-target"></div>
+    </div>
+  </header>
+
+  <!-- 메인 -->
+  <main class="flex-grow px-container-margin py-lg max-w-5xl mx-auto w-full">
+    <div class="text-center mb-xl">
+      <p class="font-body-lg text-body-lg text-on-surface-variant">대회에 적합한 경기 방식을 선택해주세요.</p>
+    </div>
+
+    <!-- 방식 카드 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-lg mb-xl">
+
+      <!-- 리그전 -->
+      <button class="format-card relative bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-lg text-left shadow-[0_4px_12px_rgba(0,74,198,0.05)] hover:border-primary-fixed hover:bg-surface-container-low transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary-fixed group"
+        onclick="selectFormat('league', this)">
+        <div class="absolute top-md right-md bg-primary text-on-primary rounded-full p-1 check-icon">
+          <span class="material-symbols-outlined text-[20px] fill">check</span>
+        </div>
+        <div class="mb-md flex items-center justify-center w-20 h-20 bg-surface-container rounded-full group-hover:bg-primary-container transition-colors">
+          <span class="material-symbols-outlined text-[40px] text-primary group-hover:text-on-primary fill">view_comfy</span>
+        </div>
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-sm">리그전</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-md">
+          참가한 모든 팀이 서로 한 번씩 경기를 치르는 방식입니다. 모든 참가자에게 고른 경기 기회를 제공합니다.
+        </p>
+        <div class="inline-flex items-center gap-xs bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md">
+          <span class="material-symbols-outlined text-[16px]">sync</span>
+          풀리그 방식
+        </div>
+      </button>
+
+      <!-- 토너먼트 -->
+      <button class="format-card relative bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-lg text-left shadow-[0_4px_12px_rgba(0,74,198,0.05)] hover:border-primary-fixed hover:bg-surface-container-low transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary-fixed group"
+        onclick="selectFormat('tournament', this)">
+        <div class="absolute top-md right-md bg-primary text-on-primary rounded-full p-1 check-icon">
+          <span class="material-symbols-outlined text-[20px] fill">check</span>
+        </div>
+        <div class="mb-md flex items-center justify-center w-20 h-20 bg-surface-container rounded-full group-hover:bg-primary-container transition-colors">
+          <span class="material-symbols-outlined text-[40px] text-primary group-hover:text-on-primary fill">account_tree</span>
+        </div>
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-sm">토너먼트</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-md">
+          경기에서 진 팀은 탈락하고, 이긴 팀끼리 다음 라운드에서 겨루어 최종 우승자를 가리는 방식입니다.
+        </p>
+        <div class="inline-flex items-center gap-xs bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md">
+          <span class="material-symbols-outlined text-[16px]">sports_martial_arts</span>
+          토너먼트 방식
+        </div>
+      </button>
+    </div>
+
+    <!-- 확정 버튼 -->
+    <div class="flex justify-center pb-lg">
+      <button id="confirmBtn" disabled onclick="confirmFormat()"
+        class="bg-primary text-on-primary font-button-text text-button-text h-touch-target px-xl rounded-full shadow-[0_4px_12px_rgba(0,74,198,0.2)] hover:bg-surface-tint active:scale-95 transition-all duration-200 opacity-50 cursor-not-allowed w-full md:w-auto flex items-center justify-center gap-sm border-b-[3px] border-[#003896]">
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        방식 선택 완료
+      </button>
+    </div>
+  </main>
+
+  <script src="../js/app.js"></script>
+  <script>
+    let selectedFormatId = null;
+
+    function selectFormat(formatId, element) {
+      document.querySelectorAll('.format-card').forEach(card => {
+        card.classList.remove('selected', 'border-primary', 'bg-surface-container-low');
+        card.classList.add('border-outline-variant');
+      });
+      element.classList.add('selected', 'border-primary', 'bg-surface-container-low');
+      element.classList.remove('border-outline-variant');
+      selectedFormatId = formatId;
+
+      const btn = document.getElementById('confirmBtn');
+      btn.disabled = false;
+      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    function confirmFormat() {
+      if (!selectedFormatId) return;
+      AppState.save('matchFormat', selectedFormatId);
+      navigate('tournament');
+    }
+  </script>
+</body>
+</html>
