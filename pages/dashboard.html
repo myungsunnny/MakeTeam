@@ -68,9 +68,8 @@
     <!-- 최근 활동 -->
     <section>
       <h3 class="font-headline-md text-headline-md text-on-surface mb-md">최근 활동</h3>
-      <div id="activityList" class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col items-center gap-sm text-center shadow-[0_4px_12px_rgba(0,74,198,0.05)]">
-        <span class="material-symbols-outlined text-[40px] text-outline-variant">history</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">최근 활동 내역이 없습니다.</p>
+      <div id="activityList" class="flex flex-col gap-sm">
+        <!-- JS로 동적 생성 -->
       </div>
     </section>
   </main>
@@ -86,6 +85,7 @@
     const totalStudentsEl = document.getElementById('totalStudents');
     const teamBtnText = document.getElementById('teamBtnText');
     const teamIcon = document.getElementById('teamIcon');
+    const activityListEl = document.getElementById('activityList');
 
     if (AppState.classroom && AppState.classroom.students) {
       totalStudentsEl.textContent = AppState.classroom.students.length;
@@ -96,6 +96,44 @@
       teamIcon.textContent = 'visibility';
     }
 
+    // 활동 내역 렌더링
+    function renderActivities() {
+      const activities = AppState.activities || [];
+      if (activities.length === 0) {
+        activityListEl.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col items-center gap-sm text-center shadow-[0_4px_12px_rgba(0,74,198,0.05)]">
+            <span class="material-symbols-outlined text-[40px] text-outline-variant">history</span>
+            <p class="font-body-md text-body-md text-on-surface-variant">최근 활동 내역이 없습니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      activityListEl.innerHTML = activities.map(act => `
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-md flex items-center gap-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary text-[20px]">${act.icon}</span>
+          </div>
+          <div class="flex-grow">
+            <p class="font-body-md text-on-surface font-medium">${act.message}</p>
+            <p class="text-[11px] text-on-surface-variant">${formatTime(act.time)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatTime(isoStr) {
+      const date = new Date(isoStr);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+      
+      if (diffMin < 1) return '방금 전';
+      if (diffMin < 60) return `${diffMin}분 전`;
+      if (diffMin < 1440) return `${Math.floor(diffMin / 60)}시간 전`;
+      return date.toLocaleDateString();
+    }
+
     function handleTeamAction() {
       if (AppState.teams && AppState.teams.length > 0) {
         navigate('teamResult');
@@ -103,6 +141,8 @@
         navigate('teamSetup');
       }
     }
+
+    renderActivities();
   </script>
 </body>
 </html>

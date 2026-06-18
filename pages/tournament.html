@@ -12,42 +12,105 @@
   <script src="../js/tailwind.config.js"></script>
   <link rel="stylesheet" href="../css/global.css"/>
   <style>
-    .round-row {
+    :root {
+      --apple-radius: 20px;
+      --apple-shadow: 0 8px 30px rgba(0,0,0,0.04);
+      --apple-shadow-hover: 0 12px 40px rgba(0,0,0,0.08);
+    }
+    .round-column {
       display: flex;
+      flex-direction: column;
       justify-content: space-around;
-      align-items: flex-start;
-      gap: 2rem;
-      padding: 1rem 0;
-      width: 100%;
+      gap: 2.5rem;
+      min-width: 220px;
     }
     .match-box {
       position: relative;
-      width: 160px;
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 200px;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 10;
+    }
+    .match-box:hover {
+      transform: scale(1.02);
+    }
+    .match-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: var(--apple-radius);
+      overflow: hidden;
+      box-shadow: var(--apple-shadow);
     }
     .team-node {
-      transition: all 0.4s ease;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      height: 48px;
     }
     .team-node:hover {
-      transform: translateY(2px);
-      filter: brightness(1.05);
+      background-color: rgba(0, 0, 0, 0.02);
     }
-    .team-node.winner-active {
-      animation: levelDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 20;
+    .team-node.winner {
+      background-color: rgba(var(--md-sys-color-primary-rgb), 0.08);
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
     }
-    @keyframes levelDown {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(20px) scale(1.1); filter: brightness(1.2); }
-      100% { transform: translateY(0) scale(1); }
+    .team-node.loser {
+      opacity: 0.4;
+      filter: grayscale(1);
     }
+    
+    /* Connectors */
+    .connector-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .connector-line {
+      fill: none;
+      stroke: #E5E7EB;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+    .connector-line.active {
+      stroke: var(--md-sys-color-primary);
+      stroke-width: 3;
+    }
+
     .trophy-glow {
-      animation: trophyGlow 2s infinite alternate;
+      animation: trophyGlow 3s infinite alternate;
     }
     @keyframes trophyGlow {
-      from { filter: drop-shadow(0 0 5px rgba(254, 208, 27, 0.3)); }
-      to { filter: drop-shadow(0 0 15px rgba(254, 208, 27, 0.8)); }
+      from { filter: drop-shadow(0 0 5px rgba(254, 208, 27, 0.2)); }
+      to { filter: drop-shadow(0 0 20px rgba(254, 208, 27, 0.6)); }
+    }
+
+    /* Premium Button Style */
+    .premium-btn {
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      border-radius: 14px;
+    }
+    .premium-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Glassmorphism Tabs */
+    .glass-tabs {
+      background: rgba(0, 0, 0, 0.03);
+      padding: 4px;
+      border-radius: 16px;
+    }
+    .glass-tabs button {
+      border-radius: 12px;
     }
   </style>
 </head>
@@ -69,74 +132,109 @@
   </header>
 
   <!-- 메인 -->
-  <main class="flex-grow px-container-margin py-lg max-w-lg mx-auto w-full">
+  <main class="flex-grow px-container-margin py-lg max-w-7xl mx-auto w-full">
 
-    <div class="mb-lg">
-      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold" id="pageTitle">경기 방식 선택</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant mt-xs" id="pageSubTitle">원하는 경기 방식을 선택하고 진행하세요.</p>
+    <div class="mb-lg lg:mb-xl flex flex-col lg:flex-row lg:items-end lg:justify-between gap-md">
+      <div>
+        <h2 class="font-headline-lg-mobile lg:font-headline-lg text-headline-lg-mobile lg:text-headline-lg text-on-surface font-bold" id="pageTitle">경기 방식 선택</h2>
+        <p class="font-body-md lg:font-body-lg text-body-md lg:text-body-lg text-on-surface-variant mt-xs" id="pageSubTitle">원하는 경기 방식을 선택하고 진행하세요.</p>
+      </div>
+      
+      <!-- 데스크탑용 추가 필터나 컨트롤이 들어갈 수 있는 공간 -->
     </div>
 
-    <!-- 1단계: 경기 방식 및 설정 탭 -->
-    <div class="flex flex-col gap-md mb-lg">
-      <div class="grid grid-cols-2 gap-sm bg-surface-container-low rounded-xl p-xs">
-        <button id="format-tournament" onclick="setFormat('tournament')"
-          class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
-          토너먼트
-        </button>
-        <button id="format-league" onclick="setFormat('league')"
-          class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
-          리그전
-        </button>
-      </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+      
+      <!-- 왼쪽 설정 패널 (데스크탑에서 4컬럼) -->
+      <aside class="lg:col-span-4 flex flex-col gap-md">
+        <!-- 1단계: 경기 방식 및 설정 탭 -->
+        <div class="flex flex-col gap-md">
+          <div class="grid grid-cols-3 gap-sm glass-tabs">
+            <button id="format-tournament" onclick="setFormat('tournament')"
+              class="h-11 font-label-md text-label-md transition-all duration-300 premium-btn">
+              토너먼트
+            </button>
+            <button id="format-league" onclick="setFormat('league')"
+              class="h-11 font-label-md text-label-md transition-all duration-300 premium-btn">
+              리그전
+            </button>
+            <button id="format-ladder" onclick="setFormat('ladder')"
+              class="h-11 font-label-md text-label-md transition-all duration-300 premium-btn">
+              사다리
+            </button>
+          </div>
 
-      <div id="league-config" class="hidden animate-in slide-in-from-top-4 duration-300">
-        <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm">
-          <label class="font-label-md text-on-surface-variant mb-sm block">진행할 총 경기 수 (팀당)</label>
-          <div class="flex items-center gap-md">
-            <input type="range" id="leagueMatchCount" min="1" max="10" value="1" 
-              class="flex-1 accent-primary" oninput="updateLeagueMatchText(this.value)">
-            <span class="font-headline-sm text-primary font-bold w-12 text-center" id="matchCountDisplay">1회</span>
+          <div id="league-config" class="hidden animate-in slide-in-from-top-4 duration-300">
+            <div class="bg-surface-container-lowest rounded-[20px] p-md border border-outline-variant shadow-sm">
+              <label class="font-label-md text-on-surface-variant mb-sm block">진행할 총 경기 수 (팀당)</label>
+              <div class="flex items-center gap-md">
+                <input type="range" id="leagueMatchCount" min="1" max="10" value="1" 
+                  class="flex-1 accent-primary" oninput="updateLeagueMatchText(this.value)">
+                <span class="font-headline-sm text-primary font-bold w-12 text-center" id="matchCountDisplay">1회</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="tournament-config" class="hidden animate-in slide-in-from-top-4 duration-300">
+            <div class="flex flex-col gap-sm">
+              <button onclick="shuffleTournament()" class="w-full h-12 bg-surface-container-lowest text-primary border border-primary/20 rounded-[16px] font-button-text flex items-center justify-center gap-sm hover:bg-primary/5 active:scale-95 transition-all shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">shuffle</span>
+                대진표 무작위 섞기
+              </button>
+              <div class="flex items-center justify-between px-md py-sm bg-surface-container-lowest rounded-[16px] border border-outline-variant shadow-sm">
+                <span class="font-label-md text-on-surface">패자부활전 활성화</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="doubleElimToggle" class="sr-only peer" onchange="toggleDoubleElim(this.checked)">
+                  <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div id="ladder-config" class="hidden animate-in slide-in-from-top-4 duration-300">
+            <button onclick="generateLadder()" class="w-full h-12 bg-primary text-on-primary rounded-[16px] font-button-text flex items-center justify-center gap-sm hover:opacity-95 active:scale-95 transition-all shadow-md shadow-primary/20">
+              <span class="material-symbols-outlined text-[20px]">account_tree</span>
+              사다리 다시 생성하기
+            </button>
           </div>
         </div>
-      </div>
 
-      <div id="tournament-config" class="hidden animate-in slide-in-from-top-4 duration-300">
-        <button onclick="shuffleTournament()" class="w-full h-touch-target bg-surface-container-lowest text-primary border-2 border-primary/30 rounded-xl font-button-text flex items-center justify-center gap-sm hover:bg-primary/5 active:scale-95 transition-all">
-          <span class="material-symbols-outlined text-[20px]">shuffle</span>
-          대진표 무작위 섞기
-        </button>
-      </div>
-    </div>
-
-    <!-- 2단계: 뷰 전환 -->
-    <div id="view-tabs" class="grid grid-cols-2 gap-sm bg-surface-container-low rounded-xl p-xs mb-lg">
-      <button id="tab-bracket" onclick="switchTab('bracket')"
-        class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
-        대진표
-      </button>
-      <button id="tab-ranking" onclick="switchTab('ranking')"
-        class="h-touch-target rounded-lg font-label-md text-label-md transition-all duration-300">
-        순위표
-      </button>
-    </div>
-
-    <!-- 대진표 뷰 -->
-    <div id="view-bracket" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div id="tournament-graphic" class="hidden overflow-x-auto pb-lg mb-lg">
-        <div class="flex flex-col items-center min-w-max p-lg gap-12" id="bracketTree">
-          <!-- JS로 동적 트리 생성 -->
+        <!-- 2단계: 뷰 전환 -->
+        <div id="view-tabs" class="grid grid-cols-2 gap-sm glass-tabs">
+          <button id="tab-bracket" onclick="switchTab('bracket')"
+            class="h-11 font-label-md text-label-md transition-all duration-300 premium-btn">
+            대진표
+          </button>
+          <button id="tab-ranking" onclick="switchTab('ranking')"
+            class="h-11 font-label-md text-label-md transition-all duration-300 premium-btn">
+            순위표
+          </button>
         </div>
-      </div>
-      <div id="bracketContent" class="flex flex-col gap-md">
-        <!-- JS로 생성 -->
-      </div>
-    </div>
+      </aside>
 
-    <!-- 순위표 뷰 -->
-    <div id="view-ranking" class="hidden">
-      <div id="rankingContent" class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
-        <!-- JS로 생성 -->
-      </div>
+      <!-- 오른쪽 메인 콘텐츠 (데스크탑에서 8컬럼) -->
+      <section class="lg:col-span-8">
+        <!-- 대진표 뷰 -->
+        <div id="view-bracket" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div id="tournament-graphic" class="hidden overflow-x-auto pb-lg mb-lg relative rounded-2xl bg-black/[0.02] border border-black/[0.03]">
+            <svg id="bracketConnectors" class="connector-container"></svg>
+            <div class="flex items-start min-w-max p-lg gap-16" id="bracketTree">
+              <!-- JS로 동적 트리 생성 -->
+            </div>
+          </div>
+          <div id="bracketContent" class="grid grid-cols-1 md:grid-cols-2 gap-md">
+            <!-- JS로 생성 -->
+          </div>
+        </div>
+
+        <!-- 순위표 뷰 -->
+        <div id="view-ranking" class="hidden">
+          <div id="rankingContent" class="bg-surface-container-lowest rounded-[24px] border border-outline-variant overflow-hidden shadow-sm">
+            <!-- JS로 생성 -->
+          </div>
+        </div>
+      </section>
+
     </div>
 
   </main>
@@ -159,20 +257,33 @@
   <script>
     let currentFormat = AppState.matchFormat || 'tournament';
     let leagueMatchCount = 1;
+    let isDoubleElim = AppState.isDoubleElim || false;
 
     function setFormat(format) {
       currentFormat = format;
       AppState.save('matchFormat', format);
       document.getElementById('league-config').classList.toggle('hidden', format !== 'league');
       document.getElementById('tournament-config').classList.toggle('hidden', format !== 'tournament');
-      const activeClass = ['bg-surface-container-lowest', 'text-primary', 'shadow-sm'];
-      const inactiveClass = ['text-on-surface-variant', 'hover:bg-surface-container-low'];
-      ['tournament', 'league'].forEach(f => {
+      document.getElementById('ladder-config').classList.toggle('hidden', format !== 'ladder');
+      
+      const activeClass = ['bg-white', 'text-primary', 'shadow-sm'];
+      const inactiveClass = ['text-on-surface-variant', 'hover:bg-black/5'];
+      ['tournament', 'league', 'ladder'].forEach(f => {
         const btn = document.getElementById(`format-${f}`);
+        if (!btn) return;
         if (f === format) { btn.classList.add(...activeClass); btn.classList.remove(...inactiveClass); }
         else { btn.classList.remove(...activeClass); btn.classList.add(...inactiveClass); }
       });
-      document.getElementById('pageTitle').textContent = format === 'tournament' ? '토너먼트 경기' : '리그전 경기';
+      
+      const titles = { 'tournament': '토너먼트 경기', 'league': '리그전 경기', 'ladder': '사다리 타기' };
+      document.getElementById('pageTitle').textContent = titles[format] || '경기 방식';
+      
+      renderBracket();
+    }
+
+    function toggleDoubleElim(checked) {
+      isDoubleElim = checked;
+      AppState.save('isDoubleElim', checked);
       renderBracket();
     }
 
@@ -182,6 +293,24 @@
       AppState.save('teams', teams);
       AppState.save('matchResults', []);
       renderBracket();
+    }
+
+    function generateLadder() {
+      const teams = [...AppState.teams].sort(() => Math.random() - 0.5);
+      const ladderMatches = [];
+      for(let i=0; i<teams.length; i+=2) {
+        if(teams[i+1]) {
+          ladderMatches.push({ id: `ladder-${i}`, team1: teams[i], team2: teams[i+1], label: '사다리 매칭' });
+        }
+      }
+      
+      const container = document.getElementById('bracketContent');
+      if (ladderMatches.length === 0) {
+        container.innerHTML = `<div class="p-lg text-center opacity-50">매칭 가능한 팀이 부족합니다.</div>`;
+      } else {
+        container.innerHTML = ladderMatches.map((m, idx) => renderMatchCard(m, idx)).join('');
+      }
+      document.getElementById('tournament-graphic').classList.add('hidden');
     }
 
     function updateLeagueMatchText(val) {
@@ -194,8 +323,8 @@
       const isBracket = tab === 'bracket';
       document.getElementById('view-bracket').classList.toggle('hidden', !isBracket);
       document.getElementById('view-ranking').classList.toggle('hidden', isBracket);
-      const activeClass = ['bg-surface-container-lowest', 'text-primary', 'shadow-sm'];
-      const inactiveClass = ['text-on-surface-variant', 'hover:bg-surface-container-low'];
+      const activeClass = ['bg-white', 'text-primary', 'shadow-sm'];
+      const inactiveClass = ['text-on-surface-variant', 'hover:bg-black/5'];
       ['bracket', 'ranking'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (t === tab) { btn.classList.add(...activeClass); btn.classList.remove(...inactiveClass); }
@@ -207,22 +336,22 @@
 
     function getTournamentStructure(teams) {
       const count = teams.length;
-      if (count < 2) return null;
+      if (count < 2) return [];
       const size = Math.pow(2, Math.ceil(Math.log2(count)));
       const results = AppState.matchResults || [];
+      
       let currentRound = [];
       for (let i = 0; i < size; i += 2) {
-        const team1 = teams[i] || null;
-        const team2 = teams[i+1] || null;
-        if (!team1 && !team2) continue;
+        const t1 = teams[i] || null;
+        const t2 = teams[i+1] || null;
         const matchId = `t-r1-m${i/2}`;
         const res = results.find(r => r.id === matchId);
         let winner = null;
-        if (team1 && !team2) winner = team1;
-        else if (!team1 && team2) winner = team2;
-        else if (res) winner = (res.result === 'win1' ? team1 : team2);
-        currentRound.push({ id: matchId, team1, team2, winner, label: (size === 2 ? '결승' : (size === 4 ? '준결승' : '1라운드')) });
+        if (t1 && !t2) winner = t1;
+        else if (res) winner = (res.result === 'win1' ? t1 : t2);
+        currentRound.push({ id: matchId, team1: t1, team2: t2, winner, label: '1라운드' });
       }
+
       const rounds = [currentRound];
       while (currentRound.length > 1) {
         const nextRound = [];
@@ -234,11 +363,14 @@
           const matchId = `t-r${rounds.length + 1}-m${i/2}`;
           const res = results.find(r => r.id === matchId);
           let winner = null;
-          if (t1 && !t2 && m1.winner && !m2) winner = t1;
-          else if (!t1 && t2 && !m1 && m2.winner) winner = t2;
+          if (t1 && !t2 && m1.winner) winner = t1;
           else if (res) winner = (res.result === 'win1' ? t1 : t2);
-          const nextLabel = (currentRound.length / 2 === 1 ? '결승' : (currentRound.length / 2 === 2 ? '준결승' : `${rounds.length + 1}라운드`));
-          nextRound.push({ id: matchId, team1: t1, team2: t2, winner, label: nextLabel });
+          
+          let label = `${rounds.length + 1}라운드`;
+          if (currentRound.length / 2 === 1) label = '결승';
+          else if (currentRound.length / 2 === 2) label = '준결승';
+          
+          nextRound.push({ id: matchId, team1: t1, team2: t2, winner, label });
         }
         rounds.push(nextRound);
         currentRound = nextRound;
@@ -254,13 +386,14 @@
         container.innerHTML = `<div class="p-lg text-center opacity-50">배정된 팀이 없습니다.</div>`;
         return;
       }
+      
       if (currentFormat === 'tournament') {
         graphicView.classList.remove('hidden');
         const rounds = getTournamentStructure(teams);
         renderTournamentGraphic(rounds);
         const pending = rounds.flat().filter(m => m.team1 && m.team2);
-        container.innerHTML = pending.map((m, idx) => renderMatchCard(m, idx)).join('');
-      } else {
+        container.innerHTML = pending.length ? pending.map((m, idx) => renderMatchCard(m, idx)).join('') : '<div class="text-center p-md opacity-50">진행 가능한 경기가 없습니다.</div>';
+      } else if (currentFormat === 'league') {
         graphicView.classList.add('hidden');
         let matches = [];
         for (let i = 0; i < teams.length; i++) {
@@ -271,6 +404,8 @@
           }
         }
         container.innerHTML = matches.map((m, idx) => renderMatchCard(m, idx)).join('');
+      } else {
+        generateLadder();
       }
     }
 
@@ -281,25 +416,25 @@
       return `
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300" style="animation-delay: ${idx * 50}ms">
           <div class="bg-surface-container px-md py-sm flex justify-between items-center">
-            <span class="font-label-md text-on-surface-variant text-xs">${match.label}</span>
+            <span class="font-label-md text-on-surface-variant text-[10px] uppercase font-bold">${match.label}</span>
             ${resType ? '<span class="text-primary font-bold text-[10px] bg-primary/10 px-2 py-0.5 rounded uppercase">Recorded</span>' : ''}
           </div>
           <div class="p-md flex flex-col gap-md">
-            <div class="flex items-center justify-between">
-              <div onclick="showTeamDetails('${match.team1.name}')" class="flex items-center gap-sm flex-1 cursor-pointer hover:bg-black/5 p-1 rounded-lg transition-colors">
-                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs">${match.team1.name.charAt(0)}</div>
-                <span class="font-bold truncate">${match.team1.name}</span>
+            <div class="flex items-center justify-between gap-md">
+              <div onclick="showTeamDetails('${match.team1.name}')" class="flex items-center gap-sm flex-1 cursor-pointer hover:bg-black/5 p-1 rounded-lg transition-colors overflow-hidden">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs flex-shrink-0">${match.team1.name.charAt(0)}</div>
+                <span class="font-bold truncate text-sm">${match.team1.name}</span>
               </div>
-              <span class="mx-4 text-outline-variant font-bold italic">VS</span>
-              <div onclick="showTeamDetails('${match.team2.name}')" class="flex items-center justify-end gap-sm flex-1 text-right cursor-pointer hover:bg-black/5 p-1 rounded-lg transition-colors">
-                <span class="font-bold truncate">${match.team2.name}</span>
-                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container text-xs">${match.team2.name.charAt(0)}</div>
+              <span class="text-outline-variant font-bold italic text-xs">VS</span>
+              <div onclick="showTeamDetails('${match.team2.name}')" class="flex items-center justify-end gap-sm flex-1 text-right cursor-pointer hover:bg-black/5 p-1 rounded-lg transition-colors overflow-hidden">
+                <span class="font-bold truncate text-sm">${match.team2.name}</span>
+                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container text-xs flex-shrink-0">${match.team2.name.charAt(0)}</div>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-xs">
-              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'win1')" class="h-9 rounded-lg text-xs font-bold transition-all ${resType === 'win1' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${match.team1.name} 승</button>
-              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'draw')" class="h-9 rounded-lg text-xs font-bold transition-all ${resType === 'draw' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">무</button>
-              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'win2')" class="h-9 rounded-lg text-xs font-bold transition-all ${resType === 'win2' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${match.team2.name} 승</button>
+            <div class="grid grid-cols-3 gap-sm">
+              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'win1')" class="h-10 rounded-xl text-xs font-bold transition-all ${resType === 'win1' ? 'bg-primary text-on-primary shadow-md' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${match.team1.name.length > 4 ? '승' : match.team1.name + ' 승'}</button>
+              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'draw')" class="h-10 rounded-xl text-xs font-bold transition-all ${resType === 'draw' ? 'bg-primary text-on-primary shadow-md' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">무승부</button>
+              <button onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', 'win2')" class="h-10 rounded-xl text-xs font-bold transition-all ${resType === 'win2' ? 'bg-primary text-on-primary shadow-md' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${match.team2.name.length > 4 ? '승' : match.team2.name + ' 승'}</button>
             </div>
           </div>
         </div>
@@ -308,66 +443,107 @@
 
     function renderTournamentGraphic(rounds) {
       const treeContainer = document.getElementById('bracketTree');
-      let html = '';
+      const svgContainer = document.getElementById('bracketConnectors');
+      treeContainer.innerHTML = '';
+      svgContainer.innerHTML = '';
       
-      // 라운드별 렌더링 (순서대로 상단 -> 하단 진행)
       rounds.forEach((round, rIdx) => {
-        html += `<div class="round-row">`;
+        const col = document.createElement('div');
+        col.className = 'round-column';
+        col.id = `round-${rIdx}`;
+        
+        const label = document.createElement('div');
+        label.className = 'text-center font-bold text-primary text-xs uppercase tracking-widest mb-4';
+        label.textContent = round[0]?.label || `Round ${rIdx + 1}`;
+        col.appendChild(label);
+
         round.forEach((match, mIdx) => {
+          const mBox = document.createElement('div');
+          mBox.className = 'match-box';
+          mBox.id = `match-${rIdx}-${mIdx}`;
+          
           const isWinner1 = match.winner && match.team1 && match.winner.name === match.team1.name;
           const isWinner2 = match.winner && match.team2 && match.winner.name === match.team2.name;
-          
-          html += `
-            <div class="match-box">
-              <div class="bg-surface-container-lowest border-2 ${match.winner ? 'border-primary' : 'border-outline-variant'} rounded-xl overflow-hidden shadow-md">
-                ${renderTeamNodeInGraphic(match.team1, isWinner1, match.id, 'win1', match.team2)}
-                <div class="h-px bg-outline-variant/30"></div>
-                ${renderTeamNodeInGraphic(match.team2, isWinner2, match.id, 'win2', match.team1)}
-              </div>
-              <div class="text-[9px] text-center font-bold text-on-surface-variant mt-1 uppercase tracking-tighter">${match.label}</div>
+          const hasLoser = match.winner && (match.team1 && match.team2);
+
+          mBox.innerHTML = `
+            <div class="match-card">
+              ${renderNode(match.team1, isWinner1, hasLoser && !isWinner1, match, 'win1')}
+              <div class="h-px bg-outline-variant/30"></div>
+              ${renderNode(match.team2, isWinner2, hasLoser && !isWinner2, match, 'win2')}
             </div>
           `;
+          col.appendChild(mBox);
         });
-        html += `</div>`;
+        treeContainer.appendChild(col);
       });
 
-      // 우승컵 표시 (최하단)
+      // 우승컵 추가
+      const champCol = document.createElement('div');
+      champCol.className = 'round-column items-center justify-center';
       const lastRound = rounds[rounds.length - 1][0];
       const champion = lastRound.winner;
-      html += `
-        <div class="flex flex-col items-center gap-4 mt-4">
+      champCol.innerHTML = `
+        <div class="flex flex-col items-center gap-4">
           <div class="w-24 h-24 rounded-full bg-primary/10 border-4 ${champion ? 'border-primary trophy-glow' : 'border-outline-variant border-dashed'} flex items-center justify-center relative">
             <span class="material-symbols-outlined text-5xl ${champion ? 'text-primary animate-bounce' : 'text-outline-variant'}">emoji_events</span>
-            ${champion ? `<div class="absolute -bottom-10 bg-primary text-on-primary px-3 py-1 rounded-full font-bold text-xs shadow-lg animate-in zoom-in">${champion.name} 우승!</div>` : ''}
+            ${champion ? `<div class="absolute -bottom-12 whitespace-nowrap bg-primary text-on-primary px-4 py-1.5 rounded-full font-bold text-sm shadow-lg animate-in zoom-in">${champion.name} 우승!</div>` : ''}
           </div>
         </div>
       `;
-      
-      treeContainer.innerHTML = html;
+      treeContainer.appendChild(champCol);
+
+      // 커넥터 그리기 (잠시 후 실행하여 좌표 확보)
+      setTimeout(() => drawConnectors(rounds), 100);
     }
 
-    function renderTeamNodeInGraphic(team, isWinner, matchId, resVal, opponent) {
-      if (!team) return `<div class="p-2 text-[9px] text-outline-variant italic text-center">부전승 대기</div>`;
-      
+    function renderNode(team, isWinner, isLoser, match, resVal) {
+      if (!team) return `<div class="team-node italic opacity-30 text-[10px] justify-center">대기 중</div>`;
+      const opponent = resVal === 'win1' ? match.team2 : match.team1;
       const canClick = !!opponent;
-      const clickHandler = canClick ? `onclick="handleNodeClick(this, '${matchId}', '${team.name}', '${opponent.name}', '${resVal}')"` : '';
+      const clickHandler = canClick ? `onclick="setResult('${match.id}', '${match.team1.name}', '${match.team2.name}', '${resVal}')"` : '';
       
       return `
-        <div ${clickHandler} class="team-node p-2 flex items-center justify-between transition-all ${isWinner ? 'bg-primary/20' : 'hover:bg-black/5'}">
+        <div ${clickHandler} class="team-node ${isWinner ? 'winner' : ''} ${isLoser ? 'loser' : ''}">
           <div class="flex items-center gap-2 truncate">
-            <div class="w-5 h-5 rounded-full bg-primary text-[10px] text-on-primary flex items-center justify-center font-bold flex-shrink-0">${team.name.charAt(0)}</div>
-            <span class="text-xs font-bold truncate ${isWinner ? 'text-primary' : ''}">${team.name}</span>
+            <div class="w-5 h-5 rounded-full bg-surface-container-highest text-[10px] flex items-center justify-center font-bold">${team.name.charAt(0)}</div>
+            <span class="truncate">${team.name}</span>
           </div>
-          ${isWinner ? '<span class="material-symbols-outlined text-primary text-sm animate-in zoom-in">check_circle</span>' : ''}
+          ${isWinner ? '<span class="material-symbols-outlined text-sm">check_circle</span>' : ''}
         </div>
       `;
     }
 
-    function handleNodeClick(el, matchId, t1, t2, res) {
-      el.classList.add('winner-active');
-      setTimeout(() => {
-        setResult(matchId, t1, t2, res);
-      }, 400);
+    function drawConnectors(rounds) {
+      const svg = document.getElementById('bracketConnectors');
+      const containerRect = document.getElementById('tournament-graphic').getBoundingClientRect();
+      svg.setAttribute('width', document.getElementById('bracketTree').scrollWidth);
+      svg.setAttribute('height', document.getElementById('bracketTree').scrollHeight);
+      
+      for (let r = 0; r < rounds.length - 1; r++) {
+        for (let m = 0; m < rounds[r].length; m++) {
+          const currentMatch = document.getElementById(`match-${r}-${m}`);
+          const nextMatch = document.getElementById(`match-${r+1}-${Math.floor(m/2)}`);
+          if (!currentMatch || !nextMatch) continue;
+
+          const startRect = currentMatch.getBoundingClientRect();
+          const endRect = nextMatch.getBoundingClientRect();
+          
+          const startX = startRect.right - containerRect.left + document.getElementById('tournament-graphic').scrollLeft;
+          const startY = startRect.top + startRect.height / 2 - containerRect.top + document.getElementById('tournament-graphic').scrollTop;
+          
+          const endX = endRect.left - containerRect.left + document.getElementById('tournament-graphic').scrollLeft;
+          const endY = endRect.top + (m % 2 === 0 ? endRect.height * 0.25 : endRect.height * 0.75) - containerRect.top + document.getElementById('tournament-graphic').scrollTop;
+          
+          const midX = startX + (endX - startX) / 2;
+          
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          const d = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
+          path.setAttribute('d', d);
+          path.setAttribute('class', `connector-line ${rounds[r][m].winner ? 'active' : ''}`);
+          svg.appendChild(path);
+        }
+      }
     }
 
     function setResult(matchId, t1, t2, res) {
@@ -403,6 +579,8 @@
 
     function closeTeamModal() { document.getElementById('teamModal').classList.add('hidden'); document.body.style.overflow = ''; }
 
+    // Init Double Elim toggle state
+    document.getElementById('doubleElimToggle').checked = isDoubleElim;
     setFormat(currentFormat);
     loadComponent('#bottom-nav-container', '../components/bottom-nav.html');
   </script>

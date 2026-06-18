@@ -59,15 +59,21 @@ const AppState = {
   // 팀 통계 (순위용)
   teamsStats: JSON.parse(sessionStorage.getItem('teamsStats') || '{}'),
 
+  // 최근 활동 내역
+  activities: JSON.parse(sessionStorage.getItem('activities') || '[]'),
+
   // 선택된 경기 방식
   matchFormat: sessionStorage.getItem('matchFormat') || null,
+
+  // 패자부활전 여부
+  isDoubleElim: JSON.parse(sessionStorage.getItem('isDoubleElim') || 'false'),
 
   // 상태 저장
   save(key, value) {
     this[key] = value;
     sessionStorage.setItem(key, JSON.stringify(value));
     
-    // 만약 teams가 새로 저장되면 통계도 초기화
+    // 만약 teams가 새로 저장되면 통계도 초기화 및 활동 기록
     if (key === 'teams' && value) {
       const stats = {};
       value.forEach(team => {
@@ -75,7 +81,21 @@ const AppState = {
       });
       this.save('teamsStats', stats);
       this.save('matchResults', []);
+      this.logActivity('group', `${value.length}개의 새로운 팀이 배정되었습니다.`);
     }
+  },
+
+  // 활동 기록
+  logActivity(icon, message) {
+    const activities = [...this.activities];
+    activities.unshift({
+      icon,
+      message,
+      time: new Date().toISOString()
+    });
+    // 최대 10개까지만 유지
+    if (activities.length > 10) activities.pop();
+    this.save('activities', activities);
   },
 
   // 결과 기록 및 순위 업데이트
@@ -84,6 +104,11 @@ const AppState = {
     const results = [...this.matchResults];
     const existingIdx = results.findIndex(r => r.id === matchId);
     
+    let activityMsg = '';
+    if (result === 'win1') activityMsg = `${team1Name} 팀이 승리했습니다.`;
+    else if (result === 'win2') activityMsg = `${team2Name} 팀이 승리했습니다.`;
+    else activityMsg = `${team1Name} vs ${team2Name} 경기가 무승부로 종료되었습니다.`;
+
     if (existingIdx > -1) {
       // 기존 결과 취소 (기존 점수 차감)
       this.updateStatsFromResult(results[existingIdx], -1);
@@ -91,6 +116,8 @@ const AppState = {
     } else {
       results.push({ id: matchId, team1: team1Name, team2: team2Name, result });
     }
+    
+    this.logActivity('sports_score', activityMsg);
     
     // 새로운 결과 반영 (점수 가산)
     this.updateStatsFromResult({ id: matchId, team1: team1Name, team2: team2Name, result }, 1);
