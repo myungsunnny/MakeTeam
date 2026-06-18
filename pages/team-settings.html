@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>팀 배정 설정</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#0b1c30",
+                        "surface-container-low": "#eff4ff",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#dbe1ff",
+                        "outline-variant": "#c3c6d7",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#783200",
+                        "inverse-primary": "#b4c5ff",
+                        "primary": "#004ac6",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "secondary-fixed-dim": "#eec200",
+                        "on-tertiary-container": "#ffece5",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-fixed": "#341100",
+                        "tertiary-container": "#b54e00",
+                        "surface-container": "#e5eeff",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-primary-fixed": "#00174b",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#2563eb",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "surface-dim": "#cbdbf5",
+                        "surface-tint": "#0053db",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#eeefff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-surface-variant": "#434655",
+                        "tertiary": "#8e3c00",
+                        "background": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "outline": "#737686",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#231b00",
+                        "secondary-container": "#fed01b",
+                        "surface": "#f8f9ff",
+                        "surface-container-high": "#dce9ff",
+                        "secondary": "#735c00",
+                        "secondary-fixed": "#ffe083",
+                        "on-secondary-container": "#6f5900"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-margin": "20px",
+                        "xs": "4px",
+                        "lg": "40px",
+                        "sm": "12px",
+                        "touch-target": "48px",
+                        "xl": "64px",
+                        "md": "24px",
+                        "gutter": "16px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-md": ["Quicksand"],
+                        "button-text": ["Quicksand"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "headline-xl": ["Quicksand"],
+                        "headline-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "button-text": ["16px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .bento-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .bento-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 74, 198, 0.15);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .custom-radio:checked + label {
+            background-color: #e5eeff;
+            border-color: #2563eb;
+            color: #004ac6;
+        }
+        .custom-radio:checked + label .radio-icon {
+            color: #2563eb;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky z-40 bg-surface dark:bg-on-background shadow-[0_4px_12px_rgba(0,74,198,0.1)]">
+<div class="flex justify-between items-center h-16 px-container-margin w-full max-w-7xl mx-auto">
+<button aria-label="Menu" class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-200 text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">
+                팀 배정 설정
+            </h1>
+<button aria-label="Teacher Profile" class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-200">
+<img alt="Classroom Teacher Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-low" data-alt="A brightly lit, professional yet approachable headshot of a smiling elementary school teacher against a vibrant solid blue background. The lighting is soft and even, typical of modern UI avatars. The image exudes warmth and competence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu4RrmCe73gG72ZaIR-_49CumxLA5nHrVpb6fxeOzcU6fn_fgBBQXwD9ySQmxju3do8zUVABeQVq1hbjtM70nsFvWvh22acTnDqaunbAmQN6lOHQCLaDY3eelUH0iLvhcOvZb5RG2OtN-prAJiJeGVHnXuR1MZHIRJLKEUnmlhx8O2PzALkSEIuinpAERjQ6gg8prQ-rVixGo5ZoUscL6YCz5JSakqYrDGPbgsCwahmqn7qObG_PngdueCkJciukM-BjkwOWAMp30"/>
+</button>
+</div>
+</header>
+<main class="flex-grow flex justify-center items-start pt-lg pb-xl px-container-margin relative">
+<div class="w-full max-w-3xl glass-panel rounded-xl shadow-[0_4px_12px_rgba(0,74,198,0.1)] border border-surface-container-low p-md md:p-lg">
+<!-- Stepper -->
+<div class="mb-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-sm text-center">1단계: 설정</h2>
+<div class="flex items-center justify-center max-w-md mx-auto">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-lg shadow-md z-10">
+                            1
+                        </div>
+<span class="font-label-md text-label-md text-primary mt-xs">설정</span>
+</div>
+<div class="flex-1 h-1 bg-surface-container-high mx-2 rounded-full relative">
+<div class="absolute top-0 left-0 h-full bg-surface-container-high rounded-full w-full"></div>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-lg shadow-sm z-10">
+                            2
+                        </div>
+<span class="font-label-md text-label-md text-on-surface-variant mt-xs">미리보기</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout for Settings -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-xl">
+<!-- Number of Teams Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_12px_rgba(0,74,198,0.05)] border border-outline-variant/30 flex flex-col justify-between bento-hover">
+<div>
+<div class="flex items-center gap-xs mb-sm">
+<span class="material-symbols-outlined text-primary">groups</span>
+<h3 class="font-label-md text-label-md text-on-surface font-bold text-lg">팀 수</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">생성할 팀의 개수를 선택해주세요.</p>
+</div>
+<div class="flex items-center justify-center gap-md bg-surface-container-low rounded-lg p-sm">
+<button class="w-touch-target h-touch-target rounded-full bg-surface flex items-center justify-center text-primary shadow-sm hover:bg-surface-container-highest transition-colors active:scale-95 border border-outline-variant/50" onclick="document.getElementById('teamCount').stepDown()" type="button">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="relative flex-1 max-w-[120px]">
+<input aria-label="Number of teams" class="w-full h-touch-target bg-surface border-2 border-outline-variant/50 focus:border-primary focus:ring-0 rounded-lg text-center font-headline-md text-headline-md text-primary font-bold shadow-inner" id="teamCount" max="20" min="2" name="teamCount" type="number" value="4"/>
+</div>
+<button class="w-touch-target h-touch-target rounded-full bg-surface flex items-center justify-center text-primary shadow-sm hover:bg-surface-container-highest transition-colors active:scale-95 border border-outline-variant/50" onclick="document.getElementById('teamCount').stepUp()" type="button">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Gender Balance Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_12px_rgba(0,74,198,0.05)] border border-outline-variant/30 flex flex-col justify-between bento-hover">
+<div>
+<div class="flex items-center gap-xs mb-sm">
+<span class="material-symbols-outlined text-secondary-container">balance</span>
+<h3 class="font-label-md text-label-md text-on-surface font-bold text-lg">성별 비율</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">팀 배정 시 성별 분배 방식을 선택하세요.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="relative">
+<input checked="" class="peer sr-only custom-radio" id="genderRandom" name="genderBalance" type="radio" value="random"/>
+<label class="flex items-center p-sm border-2 border-outline-variant/50 rounded-lg cursor-pointer transition-all duration-200 hover:bg-surface-container-lowest bg-surface" for="genderRandom">
+<span class="material-symbols-outlined radio-icon text-outline-variant mr-sm transition-colors">shuffle</span>
+<div class="flex-1">
+<span class="block font-label-md text-label-md font-bold">랜덤</span>
+</div>
+<span class="material-symbols-outlined opacity-0 peer-checked:opacity-100 text-primary transition-opacity">check_circle</span>
+</label>
+</div>
+<div class="relative">
+<input class="peer sr-only custom-radio" id="genderEqual" name="genderBalance" type="radio" value="equal"/>
+<label class="flex items-center p-sm border-2 border-outline-variant/50 rounded-lg cursor-pointer transition-all duration-200 hover:bg-surface-container-lowest bg-surface" for="genderEqual">
+<span class="material-symbols-outlined radio-icon text-outline-variant mr-sm transition-colors">wc</span>
+<div class="flex-1">
+<span class="block font-label-md text-label-md font-bold">남녀 균등 비율</span>
+</div>
+<span class="material-symbols-outlined opacity-0 peer-checked:opacity-100 text-primary transition-opacity">check_circle</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex justify-center mt-lg">
+<button class="h-[56px] px-xl bg-primary text-on-primary font-button-text text-button-text rounded-full shadow-[0_4px_12px_rgba(0,74,198,0.2)] hover:bg-primary-container hover:shadow-[0_6px_16px_rgba(0,74,198,0.3)] active:scale-95 transition-all duration-200 flex items-center justify-center gap-sm w-full md:w-auto border-b-2 border-on-primary-fixed-variant">
+<span class="material-symbols-outlined fill">magic_button</span>
+                    팀 배정하기
+                </button>
+</div>
+</div>
+</main>
+</body></html>
